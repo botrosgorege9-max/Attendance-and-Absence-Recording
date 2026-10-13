@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> تسجيل الحضور والانصراف </title>
+    
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand">
+                <div class="church-brand-icon">
+                    <img src="images/saint_anthony.jpg" alt="القديس الأنبا أنطونيوس" class="saint-avatar-nav">
+                </div>
+                <div>
+                    <div id="display-org-name" style="font-size: 1.15rem; font-weight: 800; line-height: 1.2;">كنيسة القديس العظيم  الأنبا أنطونيوس</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;"></div>تسجيل الحضور و الغياب </div>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="tab-dashboard">
+                            <i class="fas fa-chart-pie"></i> لوحة التحكم
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="tab-scanner">
+                            <i class="fas fa-camera"></i> ماسح الـ QR
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="tab-members">
+                            <i class="fas fa-users"></i> الأعضاء والطلاب
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="tab-badges">
+                            <i class="fas fa-id-card"></i> بطاقات الـ QR
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="tab-attendance">
+                            <i class="fas fa-clipboard-list"></i> سجل الحضور
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="tab-settings">
+                            <i class="fas fa-cog"></i> الإعدادات
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="time-badge">
+                    <i class="far fa-clock"></i>
+                    <span id="live-clock">--:--:--</span>
+                </div>
+                <button class="theme-btn" id="btn-toggle-theme" title="تبديل المظهر النهاري/الليلي">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Body -->
+    <main class="main-content">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="tab-pane active">
+            <!-- Church Banner with Saint Anthony Portrait -->
+            <div class="church-hero-banner" style="margin-bottom: 1.25rem;">
+                <div class="church-hero-content">
+                    <img src="images/saint_anthony.jpg" alt="القديس الأنبا أنطونيوس" class="saint-portrait-hero">
+                    <div class="church-hero-text">
+                        <div class="church-tag">✝️ كنيسة القديس العظيم الأنبا أنطونيوس كوكب البرية</div>
+                        <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0.35rem 0;">تسجيل حضور وغياب الاجتماع  </h2>
+                        <p class="church-verse">«لأَنَّهُ حَيْثُمَا اجْتَمَعَ اثْنَانِ أَوْ ثَلاَثَةٌ بِاسْمِي فَهُنَاكَ أَكُونُ فِي وَسْطِهِمْ» (متى ١٨: ٢٠)</p>
+                    </div>
+                </div>
+                <div class="quick-action-strip">
+                    <button class="btn btn-primary" onclick="App.switchTab('tab-scanner')">
+                        <i class="fas fa-camera"></i> مسح الـ QR الآن
+                    </button>
+                    <button class="btn btn-secondary" id="btn-manual-attendance">
+                        <i class="fas fa-user-check"></i> تسجيل يدوي
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <i class="fas fa-print"></i> طباعة كشف الاجتماع
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="grid grid-cols-4" style="margin-bottom: 1.5rem;">
+                <div class="card stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>إجمالي المسجلين</h3>
+                        <div class="stat-value" id="stat-total-members">0</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الحاضرون اليوم</h3>
+                        <div class="stat-value" id="stat-present-today" style="color: var(--success);">0</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>المتأخرون</h3>
+                        <div class="stat-value" id="stat-late-today" style="color: var(--warning);">0</div>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>الغائبون حتى الآن</h3>
+                        <div class="stat-value" id="stat-absent-today" style="color: var(--danger);">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate & Recent Scans Grid -->
+            <div class="grid grid-cols-2">
+                <!-- Recent Scans Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-bolt" style="color: var(--warning);"></i> أحدث عمليات التسجيل اليوم
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="App.switchTab('tab-attendance')">
+                            عرض الكل <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>الاسم</th>
+                                    <th>المعرف</th>
+                                    <th>القسم / الصف</th>
+                                    <th>الوقت</th>
+                                    <th>الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-scans">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Attendance Progress & System Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-percentage" style="color: var(--primary);"></i> نسبة الحضور اليومية
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+                        <div style="font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1;" id="stat-rate">
+                            0%
+                        </div>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem; font-weight: 600;">
+                            نسبة الطلاب والموظفين الحاضرين مقارنة بالإجمالي
+                        </p>
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+                                <i class="fas fa-check"></i> الحضور يبدأ: 08:00 ص
+                            </span>
+                            <span class="badge badge-warning" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+                                <i class="fas fa-clock"></i> حد التأخير: 08:30 ص
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: QR SCANNER ==================== -->
+        <section id="tab-scanner" class="tab-pane">
+            <div style="margin-bottom: 1.25rem;">
+                <h1 style="font-size: 1.6rem; font-weight: 800;">ماسح رمز الـ QR المباشر</h1>
+                <p style="color: var(--text-muted);">وجه بطاقة العضو نحو الكاميرا لتسجيل الحضور أو الانصراف فوراً وبشكل تلقائي.</p>
+            </div>
+
+            <div class="scanner-grid">
+                <!-- Video Viewport & Controls -->
+                <div class="card" style="padding: 1rem;">
+                    <!-- Mode Selector -->
+                    <div class="scanner-modes" style="margin-bottom: 1rem;">
+                        <button class="mode-btn active" data-mode="auto">
+                            <i class="fas fa-magic"></i> تلقائي ذكي (حضور / انصراف)
+                        </button>
+                        <button class="mode-btn" data-mode="checkin">
+                            <i class="fas fa-sign-in-alt"></i> تسجيل حضور فقط
+                        </button>
+                        <button class="mode-btn" data-mode="checkout">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل انصراف فقط
+                        </button>
+                    </div>
+
+                    <!-- Scanner Box -->
+                    <div class="scanner-viewport-wrapper">
+                        <!-- Live badge -->
+                        <div class="scanner-badge" id="scanner-status-badge">
+                            <span class="live-dot"></span> الكاميرا متصلة وجاهزة
+                        </div>
+
+                        <!-- Video Element for Native BarcodeDetector -->
+                        <video id="scanner-video" playsinline style="display: none;"></video>
+
+                        <!-- Html5Qrcode Reader Container -->
+                        <div id="reader"></div>
+
+                        <!-- Targeting Overlay & Laser -->
+                        <div class="scanner-overlay">
+                            <div class="scan-target">
+                                <div class="scan-corner-tl"></div>
+                                <div class="scan-corner-br"></div>
+                                <div class="scan-laser"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Camera selection & toggles -->
+                    <div class="scanner-controls">
+                        <select id="camera-select" class="form-control" style="flex: 1; min-width: 180px;">
+                            <option value="">جاري البحث عن الكاميرات...</option>
+                        </select>
+                        <button class="btn btn-danger" id="btn-toggle-camera">
+                            <i class="fas fa-video-slash"></i> إيقاف الكاميرا
+                        </button>
+                    </div>
+
+                    <!-- Alternative Scan options -->
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <label class="btn btn-secondary btn-sm" style="cursor: pointer;">
+                            <i class="fas fa-file-image"></i> مسح من صورة أو كاميرا الهاتف
+                            <input type="file" id="qr-file-input" accept="image/*" capture="environment" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Live Scan Result Card -->
+                <div class="card result-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-id-badge" style="color: var(--primary);"></i> نتيجة المسح الحالية
+                        </div>
+                    </div>
+
+                    <div class="last-scan-box" id="last-scan-container">
+                        <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.35rem;">
+                            في انتظار مسح الرمز...
+                        </h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted);">
+                            قم بتوجيه بطاقة الطالب أو الموظف أمام العدسة
+                        </p>
+                    </div>
+
+                    <!-- Quick Manual Entry fallback -->
+                    <div style="margin-top: 1rem;">
+                        <label class="form-label" style="font-size: 0.85rem;">في حال تلف الكود (إدخال المعرف يدوياً):</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="scanner-manual-input" class="form-control" placeholder="اكتب رقم المعرف (مثال: MEM-1001)">
+                            <button class="btn btn-primary" id="scanner-manual-submit">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: MEMBERS ==================== -->
+        <section id="tab-members" class="tab-pane">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h1 style="font-size: 1.6rem; font-weight: 800;">إدارة الخدام والمخدومين والشباب</h1>
+                    <p style="color: var(--text-muted);">تسجيل بيانات أعضاء الاجتماع، وتوليد بطاقات الـ QR الخاصة بكل مخدوم وخادم.</p>
+                </div>
+                <div class="quick-action-strip">
+                    <button class="btn btn-primary" id="btn-add-member">
+                        <i class="fas fa-user-plus"></i> إضافة عضو جديد
+                    </button>
+                    <button class="btn btn-secondary" id="btn-export-members">
+                        <i class="fas fa-file-excel" style="color: #107c41;"></i> تصدير Excel
+                    </button>
+                    <button class="btn btn-secondary" onclick="App.switchTab('tab-badges')">
+                        <i class="fas fa-id-card"></i> بطاقات الـ QR للطباعة
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                    <div style="position: relative; flex: 1;">
+                        <input type="text" id="member-search-input" class="form-control" placeholder="البحث بالاسم، كود الـ ID، أو الأسرة/المرحلة...">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>الاسم الكامل</th>
+                                <th>رقم المعرف (ID)</th>
+                                <th>الأسرة / المرحلة</th>
+                                <th>رقم الهاتف</th>
+                                <th>رمز الـ QR</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: PRINTABLE ID BADGES ==================== -->
+        <section id="tab-badges" class="tab-pane">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h1 style="font-size: 1.6rem; font-weight: 800;">بطاقات حضور الاجتماع (كنيسة الأنبا أنطونيوس)</h1>
+                    <p style="color: var(--text-muted);">بطاقات حضور مميزة تحمل صورة القديس الأنبا أنطونيوس ورمز الـ QR جاهزة للطباعة والتوزيع.</p>
+                </div>
+                <div class="quick-action-strip no-print">
+                    <button class="btn btn-primary" id="btn-print-badges">
+                        <i class="fas fa-print"></i> طباعة جميع البطاقات (A4)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Badges Grid Container -->
+            <div class="badges-grid" id="badges-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: ATTENDANCE LOGS & REPORTS ==================== -->
+        <section id="tab-attendance" class="tab-pane">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h1 style="font-size: 1.6rem; font-weight: 800;">سجل حضور وغياب الاجتماع</h1>
+                    <p style="color: var(--text-muted);">كشف حضور الاجتماعات وتاريخ القدوم، مع إمكانية التصفية وطباعة الكشوفات وتصديرها.</p>
+                </div>
+                <div class="quick-action-strip no-print">
+                    <button class="btn btn-success" id="btn-export-excel">
+                        <i class="fas fa-file-excel"></i> تصدير إلى Excel
+                    </button>
+                    <button class="btn btn-secondary" id="btn-print-attendance">
+                        <i class="fas fa-print"></i> طباعة التقرير
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <!-- Filters Bar -->
+                <div class="grid grid-cols-4 no-print" style="margin-bottom: 1.25rem;">
+                    <div>
+                        <label class="form-label">تاريخ الاجتماع:</label>
+                        <input type="date" id="filter-attendance-date" class="form-control">
+                    </div>
+                    <div>
+                        <label class="form-label">الأسرة / المرحلة:</label>
+                        <select id="filter-attendance-dept" class="form-control">
+                            <option value="">جميع الأسر والمراحل</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">الحالة:</label>
+                        <select id="filter-attendance-status" class="form-control">
+                            <option value="">جميع الحالات</option>
+                            <option value="حاضر">حاضر (في الموعد)</option>
+                            <option value="متأخر">متأخر عن بدء الاجتماع</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">بحث سريع:</label>
+                        <input type="text" id="attendance-search-input" class="form-control" placeholder="اسم المخدوم أو الخادم...">
+                    </div>
+                </div>
+
+                <!-- Printable Report Header -->
+                <div class="print-only" style="display: none; margin-bottom: 1.5rem; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <img src="images/saint_anthony.jpg" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <h2 style="font-size: 1.4rem; font-weight: 800;">كنيسة القديس العظيم الأنبا أنطونيوس</h2>
+                            <p style="font-size: 1rem; color: #475569;">كشف حضور وغياب الاجتماع</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Table -->
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>اسم العضو</th>
+                                <th>رقم المعرف</th>
+                                <th>الأسرة / المرحلة</th>
+                                <th>تاريخ الاجتماع</th>
+                                <th>وقت الحضور</th>
+                                <th>وقت الانصراف</th>
+                                <th>الحالة</th>
+                                <th class="no-print">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 6: SETTINGS ==================== -->
+        <section id="tab-settings" class="tab-pane">
+            <div style="margin-bottom: 1.25rem;">
+                <h1 style="font-size: 1.6rem; font-weight: 800;">إعدادات النظام والبيانات</h1>
+                <p style="color: var(--text-muted);">تخصيص أوقات الحضور والتأخير، إدارة النسخ الاحتياطي، وحفظ البيانات.</p>
+            </div>
+
+            <div class="grid grid-cols-2">
+                <!-- System Config Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-sliders-h" style="color: var(--primary);"></i> إعدادات المواعيد والمؤسسة
+                        </div>
+                    </div>
+
+                    <form id="settings-form">
+                        <div class="form-group">
+                            <label class="form-label">اسم المدرسة / الشركة / المؤسسة:</label>
+                            <input type="text" id="setting-org-name" class="form-control" required>
+                        </div>
+
+                        <div class="grid grid-cols-2" style="gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">موعد بدء الحضور:</label>
+                                <input type="time" id="setting-start-time" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">حد اعتبار الشخص متأخراً:</label>
+                                <input type="time" id="setting-late-time" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2" style="gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">موعد الانصراف الافتراضي:</label>
+                                <input type="time" id="setting-end-time" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">فترة الانتظار بين المسحات (ثواني):</label>
+                                <input type="number" id="setting-cooldown" class="form-control" min="1" max="10" value="3">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 600;">
+                                <input type="checkbox" id="setting-sound-enabled" style="width: 18px; height: 18px;" checked>
+                                تشغيل المؤثرات الصوتية عند المسح (نغمة تأكيد الحضور)
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                            <i class="fas fa-save"></i> حفظ الإعدادات
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Backup, Restore, and Reset Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-database" style="color: var(--secondary);"></i> النسخ الاحتياطي والبيانات
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">تصدير نسخة احتياطية كاملة:</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                قم بتنزيل ملف يحتوي على جميع الأعضاء وسجلات الحضور والإعدادات للرجوع إليها في أي وقت.
+                            </p>
+                            <button class="btn btn-secondary" id="btn-backup-data">
+                                <i class="fas fa-download"></i> تنزيل نسخة احتياطية (JSON)
+                            </button>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">استعادة نسخة احتياطية:</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                استرجع بياناتك من ملف نسخة احتياطية سابق تم تنزيله.
+                            </p>
+                            <label class="btn btn-secondary" style="cursor: pointer;">
+                                <i class="fas fa-upload"></i> اختر ملف النسخة الاحتياطية
+                                <input type="file" id="file-restore-data" accept=".json" style="display: none;">
+                            </label>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+                        <div>
+                            <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">إجراءات سريعة:</h4>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                <button class="btn btn-secondary btn-sm" id="btn-load-demo">
+                                    <i class="fas fa-magic"></i> إعادة تحميل البيانات التجريبية
+                                </button>
+                                <button class="btn btn-danger btn-sm" id="btn-reset-data">
+                                    <i class="fas fa-trash-alt"></i> تصفير سجلات الحضور
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Add / Edit Member Modal -->
+    <div class="modal-overlay" id="member-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-member-title" style="font-size: 1.15rem; font-weight: 800;">إضافة عضو جديد</h3>
+                <button class="btn btn-secondary btn-icon" id="btn-close-member-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="member-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">رقم المعرف الفريد (ID):</label>
+                        <input type="text" id="member-input-id" class="form-control" placeholder="مثال: ANT-1001" required>
+                        <small style="color: var(--text-muted); font-size: 0.8rem;">هذا الرقم هو الذي يتم تشفيره داخل رمز الـ QR الخاص بالبطاقة.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">الاسم الكامل:</label>
+                        <input type="text" id="member-input-name" class="form-control" placeholder="مثال: مينا يوسف حبيب" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">الأسرة / المرحلة / الخدمة:</label>
+                        <input type="text" id="member-input-dept" class="form-control" placeholder="مثال: أسرة القديس أثناسيوس / مرحلة ثانوي / جامعيين">
+                    </div>
+
+                    <div class="grid grid-cols-2" style="gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">الصفة / الدور:</label>
+                            <select id="member-input-role" class="form-control">
+                                <option value="مخدوم">مخدوم (عضو الاجتماع)</option>
+                                <option value="مخدومة">مخدومة</option>
+                                <option value="خادم">خادم</option>
+                                <option value="خادمة">خادمة</option>
+                                <option value="أمين خدمة">أمين خدمة / أمين أسرة</option>
+                                <option value="شماس">شماس</option>
+                                <option value="مرنم">مرنم / كورال</option>
+                                <option value="أب كاهن">أب كاهن</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف / الواتساب:</label>
+                            <input type="tel" id="member-input-phone" class="form-control" placeholder="01XXXXXXXXX">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-member-modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ العضو
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manual Attendance Modal -->
+    <div class="modal-overlay" id="manual-attendance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.15rem; font-weight: 800;">تسجيل حضور يدوي</h3>
+                <button class="btn btn-secondary btn-icon" id="btn-close-manual-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="manual-attendance-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">اختر العضو:</label>
+                        <select id="manual-member-select" class="form-control" required>
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">نوع التسجيل:</label>
+                        <select id="manual-mode-select" class="form-control">
+                            <option value="auto">تلقائي ذكي</option>
+                            <option value="checkin">تسجيل حضور</option>
+                            <option value="checkout">تسجيل انصراف</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> تأكيد التسجيل
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Single Preview Modal -->
+    <div class="modal-overlay" id="qr-preview-modal">
+        <div class="modal-content" style="max-width: 380px; text-align: center;">
+            <div class="modal-header">
+                <h3 id="qr-preview-title" style="font-size: 1.1rem; font-weight: 800;">رمز الـ QR</h3>
+                <button class="btn btn-secondary btn-icon" onclick="document.getElementById('qr-preview-modal').classList.remove('active')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+                <div id="qr-preview-box" style="padding: 10px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 0.75rem;"></div>
+                <p id="qr-preview-desc" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;"></p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; gap: 0.75rem;">
+                <button class="btn btn-primary" id="btn-download-single-qr">
+                    <i class="fas fa-download"></i> تنزيل كصورة
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('qr-preview-modal').classList.remove('active')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts -->
+    <!-- 1. Offline & Standalone QR Generator -->
+    <script src="js/qrcode.js"></script>
+
+    <!-- 2. CDN Fallback for QR Camera Scanner (Html5Qrcode) -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <!-- 3. CDN Fallback for Excel Export (SheetJS) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <!-- 4. Application Modules -->
+    <script src="js/app.js"></script>
+    <script src="js/members.js"></script>
+    <script src="js/attendance.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>
